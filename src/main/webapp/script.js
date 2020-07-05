@@ -12,17 +12,55 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
- * Adds a random greeting to the page.
- */
-function addRandomGreeting() {
-  const greetings =
-      ['Hello world!', '¡Hola Mundo!', '你好，世界！', 'Bonjour le monde!'];
+/** Fetches notes from the server and adds them to the DOM. */
+function loadNotes() {
+  fetch('/form-handler').then(response => response.json()).then((notes) => {
+    const notesElement = document.getElementById('notes-container');
+    notes.forEach((note) => {
+      notesElement.appendChild(createNoteElement(note));
+    })
+  });
+}
 
-  // Pick a random greeting.
-  const greeting = greetings[Math.floor(Math.random() * greetings.length)];
+/** Creates an element that represents a note, including its delete button. */
+function createNoteElement(note) {
+  const noteElement = document.createElement('div');
+  noteElement.className = 'note';
+  noteElement.style.cssText = 
+      'width:200px; display:block; margin-bottom:10px;';
 
-  // Add it to the page.
-  const greetingContainer = document.getElementById('greeting-container');
-  greetingContainer.innerText = greeting;
+  const imageElement = document.createElement('img');
+  imageElement.src = note.imageUrl;
+
+  const deleteButtonElement = document.createElement('button');
+  deleteButtonElement.innerText = 'Delete';
+  deleteButtonElement.addEventListener('click', () => {
+    deleteNote(note);
+
+    // Remove the note from the DOM.
+    noteElement.remove();
+  });
+
+  noteElement.appendChild(imageElement);
+  noteElement.appendChild(deleteButtonElement);
+  return noteElement;
+}
+
+/** Tells the server to delete the note. */
+function deleteNote(note) {
+  const params = new URLSearchParams();
+  params.append('id', note.id);
+  fetch('/delete-note', {method: 'POST', body: params});
+}
+
+function fetchBlobstoreUrl() {
+  fetch('/blobstore-upload-url')
+      .then((response) => {
+        return response.text();
+      })
+      .then((imageUploadUrl) => {
+        const imageForm = document.getElementById('my-form');
+        imageForm.action = imageUploadUrl;
+        imageForm.classList.remove('hidden');
+      });
 }
