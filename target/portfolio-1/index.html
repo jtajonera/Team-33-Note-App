@@ -2,17 +2,23 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>My Portfolio</title>
+    <title>GetchaNotes</title>
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
   </head>
-  <body>
+  <body onload="fetchBlobstoreUrl()">
     <div id="content">
-      <h1>My Portfolio</h1>
-      <p>This is my portfolio.</p>
-      <p>Click here to get a random message:</p>
-      <button onclick="addRandomGreeting()">Hello</button>
-      <div id="greeting-container"></div>
+      <h1>GetchaNotes</h1>
+      <form id="my-form" class="hidden" method="POST" enctype="multipart/form-data">
+        <p>Upload an image:</p>
+        <input type="file" name="image">
+        <br/><br/>
+        <button type="submit">Submit</button>
+      </form>
+      <br/><br/>
+      <button onclick="loadNotes()">View Notes</button>
+      <br/><br/>
+      <div id="notes-container"></div>
     </div>
   </body>
 </html>
