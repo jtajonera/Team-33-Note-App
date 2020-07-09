@@ -27,10 +27,13 @@ function createNoteElement(note) {
   const noteElement = document.createElement('div');
   noteElement.className = 'note';
   noteElement.style.cssText = 
-      'width:200px; display:block; margin-bottom:10px;';
+      'display:block; margin-bottom:10px;';
 
   const imageElement = document.createElement('img');
   imageElement.src = note.imageUrl;
+
+  const message = document.createElement('p');
+  message.innerText = note.message;
 
   const deleteButtonElement = document.createElement('button');
   deleteButtonElement.innerText = 'Delete';
@@ -42,6 +45,7 @@ function createNoteElement(note) {
   });
 
   noteElement.appendChild(imageElement);
+  noteElement.appendChild(message);
   noteElement.appendChild(deleteButtonElement);
   return noteElement;
 }
