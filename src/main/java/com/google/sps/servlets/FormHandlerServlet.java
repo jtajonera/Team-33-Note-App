@@ -14,6 +14,7 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
+<<<<<<< HEAD
 import com.google.cloud.vision.v1.AnnotateImageRequest;
 import com.google.cloud.vision.v1.Image;
 import com.google.cloud.vision.v1.ImageSource;
@@ -28,6 +29,9 @@ import com.google.cloud.vision.v1.Page;
 import com.google.cloud.vision.v1.TextAnnotation;
 import com.google.cloud.vision.v1.AnnotateImageResponse;
 import com.google.protobuf.ByteString;
+=======
+import org.docx4j.openpackaging.exceptions.Docx4JException;
+>>>>>>> Write test file
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -64,6 +68,12 @@ public class FormHandlerServlet extends HttpServlet {
       long timestamp = (long) entity.getProperty("timestamp");
       String message = (String) entity.getProperty("message");
       Note note = new Note(id, imageUrl, timestamp, message);
+
+      try {
+        note.writeConvertedDoc();
+      } catch (Docx4JException e){
+        System.out.println(e);
+      }
       notes.add(note);
     }
 
