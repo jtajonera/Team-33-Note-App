@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.sps.data.Note;
+import com.google.sps.data.Session;
 
 /**
  * When the user submits the form, Blobstore processes the file upload and then forwards the request
@@ -104,6 +105,11 @@ public class FormHandlerServlet extends HttpServlet {
     } catch (Docx4JException e) {
         System.out.println(e);
     }
+
+    Session session = new Session();
+    String outputFileUrl = session.uploadObject("test-output-file.docx", System.getProperty("user.dir") + "/getcha_notes.docx");
+    sessionEntity.setProperty("outputFile", outputFileUrl);
+    datastore.put(sessionEntity);
 
     response.sendRedirect("/output.html");
   }
