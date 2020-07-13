@@ -20,7 +20,7 @@ public final class Note {
     this.message = message;
   }
 
-  public void writeConvertedDoc() throws Docx4JException {
+  public static void writeConvertedDoc() throws Docx4JException {
     WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.createPackage();		
     wordMLPackage.getMainDocumentPart().addStyledParagraphOfText("Title", "Test Notes");
 

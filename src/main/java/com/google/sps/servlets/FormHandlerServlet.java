@@ -14,7 +14,6 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
-<<<<<<< HEAD
 import com.google.cloud.vision.v1.AnnotateImageRequest;
 import com.google.cloud.vision.v1.Image;
 import com.google.cloud.vision.v1.ImageSource;
@@ -29,9 +28,7 @@ import com.google.cloud.vision.v1.Page;
 import com.google.cloud.vision.v1.TextAnnotation;
 import com.google.cloud.vision.v1.AnnotateImageResponse;
 import com.google.protobuf.ByteString;
-=======
 import org.docx4j.openpackaging.exceptions.Docx4JException;
->>>>>>> Write test file
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -74,6 +71,7 @@ public class FormHandlerServlet extends HttpServlet {
       } catch (Docx4JException e){
         System.out.println(e);
       }
+
       notes.add(note);
     }
 
@@ -92,14 +90,28 @@ public class FormHandlerServlet extends HttpServlet {
     String imageUrl = getUploadedFileUrl(request, "image");
     long timestamp = System.currentTimeMillis();
     String message = detectDocumentText(imageUrl);
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+    Entity sessionEntity = new Entity("Session");
+    sessionEntity.setProperty("outputFile", null);
+    sessionEntity.setProperty("timestamp", timestamp);
+    datastore.put(sessionEntity);
+
     Entity noteEntity = new Entity("Note");
     noteEntity.setProperty("imageUrl", imageUrl);
     noteEntity.setProperty("timestamp", timestamp);
     noteEntity.setProperty("message", message);
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
     datastore.put(noteEntity);
 
-    response.sendRedirect("/index.html");
+    try {
+        Note.writeConvertedDoc();
+    } catch (Docx4JException e){
+        System.out.println(e);
+    }
+
+    response.sendRedirect("/output.html");
   }
 
   /** Returns a URL that points to the uploaded file, or null if the user didn't upload a file. */

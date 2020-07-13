@@ -68,3 +68,19 @@ function fetchBlobstoreUrl() {
         imageForm.classList.remove('hidden');
       });
 }
+
+/**
+ * Loads the output file as a download link
+ */
+function loadOutputDoc(){
+    fetch('/form-handler').then(response => response.json()).then((notes) => {
+    const notesElement = document.getElementById('notes-container');
+    notes.forEach((note) => {
+      notesElement.appendChild(createNoteElement(note));
+    })
+  });
+}
+
+// <a href="/images/myw3schoolsimage.jpg" download>
+//   <img src="/images/myw3schoolsimage.jpg" alt="W3Schools">
+// </a>
