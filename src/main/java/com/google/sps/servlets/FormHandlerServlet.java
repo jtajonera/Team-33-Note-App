@@ -66,12 +66,6 @@ public class FormHandlerServlet extends HttpServlet {
       String message = (String) entity.getProperty("message");
       Note note = new Note(id, imageUrl, timestamp, message);
 
-      try {
-        note.writeConvertedDoc();
-      } catch (Docx4JException e){
-        System.out.println(e);
-      }
-
       notes.add(note);
     }
 
@@ -107,7 +101,7 @@ public class FormHandlerServlet extends HttpServlet {
 
     try {
         Note.writeConvertedDoc();
-    } catch (Docx4JException e){
+    } catch (Docx4JException e) {
         System.out.println(e);
     }
 
