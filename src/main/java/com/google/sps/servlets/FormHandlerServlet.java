@@ -15,19 +15,6 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
-import com.google.cloud.vision.v1.AnnotateImageRequest;
-import com.google.cloud.vision.v1.Image;
-import com.google.cloud.vision.v1.ImageSource;
-import com.google.cloud.vision.v1.Feature;
-import com.google.cloud.vision.v1.ImageAnnotatorClient;
-import com.google.cloud.vision.v1.BatchAnnotateImagesResponse;
-import com.google.cloud.vision.v1.Symbol;
-import com.google.cloud.vision.v1.Word;
-import com.google.cloud.vision.v1.Paragraph;
-import com.google.cloud.vision.v1.Block;
-import com.google.cloud.vision.v1.Page;
-import com.google.cloud.vision.v1.TextAnnotation;
-import com.google.cloud.vision.v1.AnnotateImageResponse;
 import com.google.protobuf.ByteString;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -40,7 +27,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.sps.data.Note;
-import com.google.sps.data.Session;
 
 /**
  * When the user submits the form, Blobstore processes the file upload and then forwards the request
@@ -50,8 +36,7 @@ import com.google.sps.data.Session;
 @WebServlet("/form-handler")
 public class FormHandlerServlet extends HttpServlet {
   private DatastoreService datastore;
-  private Session session; 
-  
+    
   @Override
   public void init() {
     datastore = DatastoreServiceFactory.getDatastoreService();
@@ -87,7 +72,7 @@ public class FormHandlerServlet extends HttpServlet {
     
     String imageUrl = getUploadedFileUrl(request, "image");
     long timestamp = System.currentTimeMillis();
-    String message = detectDocumentText(imageUrl);
+    Note note = new Note(imageUrl);
 
     Entity sessionEntity = new Entity("Session");
     sessionEntity.setProperty("outputFile", null);
@@ -98,12 +83,17 @@ public class FormHandlerServlet extends HttpServlet {
     Entity noteEntity = new Entity("Note");
     noteEntity.setProperty("sessionKey", sessionEntityKey);
     noteEntity.setProperty("imageUrl", imageUrl);
-    noteEntity.setProperty("message", message);
+    noteEntity.setProperty("message", note.getMessage());
     datastore.put(noteEntity);
 
-    Note note = new Note(noteEntity.getKey().getId(), imageUrl, message);
-    session = new Session(sessionEntityKey, note, timestamp);
-
+    // Not sure if storing this data is even necessary, but will store for now
+    for (Map.Entry<String, List<String>> entry : note.getCategorizedText().entrySet()) {
+        Entity categorizedTextEntity = new Entity("Categorized Text");
+        categorizedTextEntity.setProperty("sessionKey", sessionEntityKey);
+        categorizedTextEntity.setProperty("heading", entry.getKey());
+        categorizedTextEntity.setProperty("relatedSentences", entry.getValue());
+        datastore.put(categorizedTextEntity);
+    }
     response.sendRedirect("/index.html");
   }
 
@@ -142,72 +132,5 @@ public class FormHandlerServlet extends HttpServlet {
       url = url.replace("http://localhost:8080/", "/");
     } 
     return url;
-  }
-    
-  /**
-   * Detects words from a picture and returns them
-   * TODO: Clean up the result, sometimes the api misreads, misses entirely, or adds additional words
-   *        
-   */
-  private static String detectDocumentText(String path) throws IOException {
-    List<AnnotateImageRequest> requests = new ArrayList<>();
-    //This only works when you publish, api can not read local urls
-    ImageSource imgSource = ImageSource.newBuilder().setImageUri(path).build(); 
-    Image img = Image.newBuilder().setSource(imgSource).build();
-    Feature feat = Feature.newBuilder().setType(Feature.Type.DOCUMENT_TEXT_DETECTION).build();
-    AnnotateImageRequest request = AnnotateImageRequest.newBuilder().addFeatures(feat).setImage(img).build();
-    requests.add(request);
-
-    // Initialize client that will be used to send requests. This client only needs to be created
-    // once, and can be reused for multiple requests. After completing all of your requests, call
-    // the "close" method on the client to safely clean up any remaining background resources.
-    try (ImageAnnotatorClient client = ImageAnnotatorClient.create()) {
-      BatchAnnotateImagesResponse response = client.batchAnnotateImages(requests);
-      List<AnnotateImageResponse> responses = response.getResponsesList();
-      client.close();
-      
-      // Check to see if any of the responses are errors
-      for (AnnotateImageResponse res : responses) {
-        if (res.hasError()) {
-          System.out.format("Error: %s%n", res.getError().getMessage());
-          return "Error: " + res.getError().getMessage();
-        }
-    
-        // For full list of available annotations, see http://g.co/cloud/vision/docs
-        TextAnnotation annotation = res.getFullTextAnnotation();
-        for (Page page : annotation.getPagesList()) {
-          String pageText = "";
-            for (Block block : page.getBlocksList()) {
-            String blockText = "";
-            for (Paragraph para : block.getParagraphsList()) {
-              String paraText = "";
-              for (Word word : para.getWordsList()) {
-              String wordText = "";
-              for (Symbol symbol : word.getSymbolsList()) {
-                wordText = wordText + symbol.getText();
-                System.out.format(
-                  "Symbol text: %s (confidence: %f)%n",
-                  symbol.getText(), symbol.getConfidence());
-                }
-                System.out.format(
-                  "Word text: %s (confidence: %f)%n%n", wordText, word.getConfidence());
-                  paraText = String.format("%s %s", paraText, wordText);
-                }
-                // Output Example using Paragraph:
-                System.out.println("%nParagraph: %n" + paraText);
-                System.out.format("Paragraph Confidence: %f%n", para.getConfidence());
-                blockText = blockText + paraText;
-            }
-            pageText = pageText + blockText;
-            }
-        }
-        return annotation.getText();
-      }
-    }
-    catch(Exception e) {
-      return "ERROR: ImageAnnotatorClient Failed, " + e;
-    }
-    // Case where the ImageAnnotatorClient works, but there are no responses from it.
-    return "Error: No responses";
   }
 }
