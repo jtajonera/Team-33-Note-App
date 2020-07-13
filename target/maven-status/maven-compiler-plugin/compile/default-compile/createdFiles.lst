@@ -1,4 +1,5 @@
 com/google/sps/servlets/BlobstoreUploadUrlServlet.class
 com/google/sps/servlets/DeleteNoteServlet.class
 com/google/sps/servlets/FormHandlerServlet.class
+com/google/sps/data/Session.class
 com/google/sps/data/Note.class

@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.sps.data.Note;
+import com.google.sps.data.Session;
 
 /**
  * When the user submits the form, Blobstore processes the file upload and then forwards the request
@@ -47,14 +48,19 @@ import com.google.sps.data.Note;
  */
 @WebServlet("/form-handler")
 public class FormHandlerServlet extends HttpServlet {
+  private DatastoreService datastore;
+  private Session session; 
+  
+  @Override
+  public void init() {
+    datastore = DatastoreServiceFactory.getDatastoreService();
+  }
 
   /** Load notes from Datastore */
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     
     Query query = new Query("Note").addSort("timestamp", SortDirection.DESCENDING);
-
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
 
     List<Note> notes = new ArrayList<>();
@@ -82,11 +88,17 @@ public class FormHandlerServlet extends HttpServlet {
     String imageUrl = getUploadedFileUrl(request, "image");
     long timestamp = System.currentTimeMillis();
     String message = detectDocumentText(imageUrl);
+
+    Entity sessionEntity = new Entity("Session");
+    sessionEntity.setProperty("outputFile", null);
+    datastore.put(sessionEntity);
+
+    session = new Session(sessionEntity.getKey());
+
     Entity noteEntity = new Entity("Note");
     noteEntity.setProperty("imageUrl", imageUrl);
     noteEntity.setProperty("timestamp", timestamp);
     noteEntity.setProperty("message", message);
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(noteEntity);
 
     response.sendRedirect("/index.html");
