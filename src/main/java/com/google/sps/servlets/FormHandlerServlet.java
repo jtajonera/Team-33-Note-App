@@ -11,6 +11,7 @@ import com.google.appengine.api.images.ServingUrlOptions;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
@@ -67,9 +68,8 @@ public class FormHandlerServlet extends HttpServlet {
     for (Entity entity : results.asIterable()) {
       long id = entity.getKey().getId();
       String imageUrl = (String) entity.getProperty("imageUrl");
-      long timestamp = (long) entity.getProperty("timestamp");
       String message = (String) entity.getProperty("message");
-      Note note = new Note(id, imageUrl, timestamp, message);
+      Note note = new Note(id, imageUrl, message);
       notes.add(note);
     }
 
@@ -91,15 +91,18 @@ public class FormHandlerServlet extends HttpServlet {
 
     Entity sessionEntity = new Entity("Session");
     sessionEntity.setProperty("outputFile", null);
+    sessionEntity.setProperty("timestamp", timestamp);
     datastore.put(sessionEntity);
 
-    session = new Session(sessionEntity.getKey());
-
+    Key sessionEntityKey = sessionEntity.getKey();
     Entity noteEntity = new Entity("Note");
+    noteEntity.setProperty("sessionKey", sessionEntityKey);
     noteEntity.setProperty("imageUrl", imageUrl);
-    noteEntity.setProperty("timestamp", timestamp);
     noteEntity.setProperty("message", message);
     datastore.put(noteEntity);
+
+    Note note = new Note(noteEntity.getKey().getId(), imageUrl, message);
+    session = new Session(sessionEntityKey, note, timestamp);
 
     response.sendRedirect("/index.html");
   }
