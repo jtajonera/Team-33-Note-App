@@ -33,31 +33,11 @@
 //  * Blobstore.
 //  */
 // @WebServlet("/output-doc")
-// public class FormHandlerServlet extends HttpServlet {
+// public class OutputDocServlet extends HttpServlet {
 
 //   /** Load notes from Datastore */
 //   @Override
 //   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    
-//     Query query = new Query("Note").addSort("timestamp", SortDirection.DESCENDING);
-
-//     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-//     PreparedQuery results = datastore.prepare(query);
-
-//     List<Note> notes = new ArrayList<>();
-//     for (Entity entity : results.asIterable()) {
-//       long id = entity.getKey().getId();
-//       String imageUrl = (String) entity.getProperty("imageUrl");
-//       long timestamp = (long) entity.getProperty("timestamp");
-
-//       Note note = new Note(id, imageUrl, timestamp);
-//       try {
-//         note.writeConvertedDoc();
-//       } catch (Docx4JException e){
-//         System.out.println(e);
-//       }
-//       notes.add(note);
-//     }
 
 //     // Convert the list of notes to JSON.
 //     Gson gson = new Gson();

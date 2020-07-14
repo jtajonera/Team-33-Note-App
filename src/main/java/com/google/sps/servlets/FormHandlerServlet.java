@@ -105,8 +105,11 @@ public class FormHandlerServlet extends HttpServlet {
     }
 
     Session session = new Session();
-    String outputFileUrl = session.uploadObject("test-output-file.docx", System.getProperty("user.dir") + "/getcha_notes.docx");
-    sessionEntity.setProperty("outputFile", outputFileUrl);
+    String objectName = note.getFileName() + ".docx";
+
+    session.uploadObject(objectName, note.getFilePath());
+    session.generateV4GetObjectSignedUrl(objectName);
+    sessionEntity.setProperty("outputFile", session.getOutputDoc());
     datastore.put(sessionEntity);
 
     response.sendRedirect("/output.html");

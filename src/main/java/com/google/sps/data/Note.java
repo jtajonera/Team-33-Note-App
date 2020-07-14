@@ -33,9 +33,11 @@ import org.docx4j.openpackaging.exceptions.Docx4JException;
 public final class Note {
     private long id;
     private Key sessionKey;
+    private String filePath;
+    private String fileName;
     private final String imageUrl;
     private final String message;
-
+    
     // how I'd imagine the NLP text can be sorted
     // key is the keyword/heading
     // value is a list of related sentences
@@ -57,8 +59,17 @@ public final class Note {
     public String getOriginalImageUrl(){
         return imageUrl;
     }
+
     public String getMessage(){
         return message;
+    }
+    
+    public String getFilePath(){
+        return filePath;
+    }
+
+    public String getFileName(){
+        return fileName;
     }
 
     public void writeConvertedDoc() throws Docx4JException, IOException {
@@ -68,9 +79,13 @@ public final class Note {
         wordMLPackage.getMainDocumentPart().addParagraphOfText("from docx4j!");
 
         // saved in Team-33-Note-App/target/portfolio-1
-        wordMLPackage.save(new File(System.getProperty("user.dir") + "/getcha_notes.docx"));
+        fileName = String.format("Getcha_Notes_%d", sessionKey.getId());
+        filePath = String.format("%s/%s", System.getProperty("user.dir"), fileName);
+        wordMLPackage.save(new File(filePath));
     }
 
+    // TODO: Depending on how the NLP is handled, we can avoid storing headings and sentences
+    // in DataStore and write the converted doc from within this class. 
     public HashMap<String, List<String>> getCategorizedText(){
         // temporary data
         categorizedText = new HashMap<>();
