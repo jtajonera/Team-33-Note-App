@@ -1,5 +1,6 @@
 package com.google.sps.data;
 
+import com.google.appengine.api.datastore.Key;
 import com.google.cloud.vision.v1.AnnotateImageRequest;
 import com.google.cloud.vision.v1.Image;
 import com.google.cloud.vision.v1.ImageSource;
@@ -22,6 +23,7 @@ import java.util.List;
 
 public final class Note {
     private long id;
+    private Key sessionKey;
     private final String imageUrl;
     private final String message;
 
@@ -37,7 +39,8 @@ public final class Note {
         this.message = message;
     }
 
-    public Note(String imageUrl) throws IOException{
+    public Note(Key sessionKey, String imageUrl) throws IOException{
+        this.sessionKey = sessionKey;
         this.imageUrl = imageUrl;
         this.message = detectDocumentText(this.imageUrl);
     }

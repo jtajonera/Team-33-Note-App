@@ -72,7 +72,6 @@ public class FormHandlerServlet extends HttpServlet {
     
     String imageUrl = getUploadedFileUrl(request, "image");
     long timestamp = System.currentTimeMillis();
-    Note note = new Note(imageUrl);
 
     Entity sessionEntity = new Entity("Session");
     sessionEntity.setProperty("outputFile", null);
@@ -80,6 +79,8 @@ public class FormHandlerServlet extends HttpServlet {
     datastore.put(sessionEntity);
 
     Key sessionEntityKey = sessionEntity.getKey();
+    Note note = new Note(sessionEntityKey, imageUrl);
+
     Entity noteEntity = new Entity("Note");
     noteEntity.setProperty("sessionKey", sessionEntityKey);
     noteEntity.setProperty("imageUrl", imageUrl);
