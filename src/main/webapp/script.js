@@ -36,8 +36,6 @@ function createNoteElement(note) {
   const message = document.createElement('p');
   message.innerText = note.message;
 
-  const categories = createUlElement(note.categories);
-
   const deleteButtonElement = document.createElement('button');
   deleteButtonElement.innerText = 'Delete';
   deleteButtonElement.addEventListener('click', () => {
@@ -47,7 +45,14 @@ function createNoteElement(note) {
     noteElement.remove();
   });
 
-  /** Creates a <ul> element containing categories. */
+  noteElement.appendChild(imageElement);
+  noteElement.appendChild(message);
+  noteElement.appendChild(createUlElement(note.categories));
+  noteElement.appendChild(deleteButtonElement);
+  return noteElement;
+}
+
+/** Creates a <ul> element containing categories. */
 function createUlElement(categories) {
   const ulElement = document.createElement('ul');
   for (j = 0; j < categories.length; j++){
@@ -57,12 +62,6 @@ function createUlElement(categories) {
   }
   ulElement.style.cssText = 'font-size:13px;';
   return ulElement;
-}
-
-  noteElement.appendChild(imageElement);
-  noteElement.appendChild(message);
-  noteElement.appendChild(deleteButtonElement);
-  return noteElement;
 }
 
 /** Tells the server to delete the note. */

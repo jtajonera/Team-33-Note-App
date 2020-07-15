@@ -57,7 +57,6 @@ public class FormHandlerServlet extends HttpServlet {
       ArrayList<String> categories = (ArrayList) entity.getProperty("categories");
 
       Note note = new Note(id, imageUrl, message, categories);
-    
       notes.add(note);
     }
 
@@ -89,7 +88,6 @@ public class FormHandlerServlet extends HttpServlet {
     noteEntity.setProperty("imageUrl", imageUrl);
     noteEntity.setProperty("message", note.getMessage());
     noteEntity.setProperty("categories", note.classifyText());
-    
 
     datastore.put(noteEntity);
 

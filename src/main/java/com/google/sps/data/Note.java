@@ -15,13 +15,6 @@ import com.google.cloud.vision.v1.Page;
 import com.google.cloud.vision.v1.TextAnnotation;
 import com.google.cloud.vision.v1.AnnotateImageResponse;
 
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
 import com.google.cloud.language.v1.ClassificationCategory;
 import com.google.cloud.language.v1.ClassifyTextRequest;
 import com.google.cloud.language.v1.ClassifyTextResponse;
@@ -30,7 +23,11 @@ import com.google.cloud.language.v1.Document.Type;
 import com.google.cloud.language.v1.EncodingType;
 import com.google.cloud.language.v1.LanguageServiceClient;
 
-
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 public final class Note {
     private long id;
@@ -50,57 +47,42 @@ public final class Note {
         this.imageUrl = imageUrl;
         this.message = message;
         this.categories = categories;
-        
     }
 
     public Note(Key sessionKey, String imageUrl) throws IOException{
         this.sessionKey = sessionKey;
         this.imageUrl = imageUrl;
         this.message = detectDocumentText(this.imageUrl);
-       // String message = detectDocumentText(this.imageUrl);
-       // classifyText(message)
-       this.categories = classifyText();
+        this.categories = classifyText();
     }
 
-
-    public ArrayList<String> classifyText() {
-    // Instantiate the Language client com.google.cloud.language.v1.LanguageServiceClient
-    try (LanguageServiceClient language = LanguageServiceClient.create()) {
-      // set content to the text string
-      Document doc = Document.newBuilder().setContent(getMessage()).setType(Type.PLAIN_TEXT).build();
-      ClassifyTextRequest request = ClassifyTextRequest.newBuilder().setDocument(doc).build();
-      // detect categories in the given text
-      ClassifyTextResponse response = language.classifyText(request);
-
-      ArrayList<String> categories = new ArrayList<>();
-
-      for (ClassificationCategory category : response.getCategoriesList()) {
-          String output = category.getName() + " " + category.getConfidence();
-          categories.add(output);    
-
-     /*   System.out.printf(
-            "Category name : %s, Confidence : %.3f\n",
-            category.getName(), category.getConfidence());
-      }
-      */
-    }
-    return categories;
-    }
-    catch(Exception e){
-        return new ArrayList();
-
-    }
-
-    
-
-    }
-
-  
     public String getOriginalImageUrl(){
         return imageUrl;
     }
     public String getMessage(){
         return message;
+    }
+
+    public ArrayList<String> classifyText() {
+      // Instantiate the Language client com.google.cloud.language.v1.LanguageServiceClient
+      try (LanguageServiceClient language = LanguageServiceClient.create()) {
+        // set content to the text string
+        Document doc = Document.newBuilder().setContent(getMessage()).setType(Type.PLAIN_TEXT).build();
+        ClassifyTextRequest request = ClassifyTextRequest.newBuilder().setDocument(doc).build();
+        // detect categories in the given text
+        ClassifyTextResponse response = language.classifyText(request);
+
+        ArrayList<String> categories = new ArrayList<>();
+
+        for (ClassificationCategory category : response.getCategoriesList()) {
+          String output = category.getName() + " " + category.getConfidence();
+          categories.add(output);  
+        }
+        return categories;
+      } 
+      catch(Exception e) {
+        return new ArrayList();
+      }
     }
 
     public HashMap<String, List<String>> getCategorizedText(){
@@ -120,7 +102,7 @@ public final class Note {
         return categorizedText;
     }
 
-    /**
+   /**
    * Detects words from a picture and returns them
    * TODO: Clean up the result, sometimes the api misreads, misses entirely, or adds additional words
    *        
