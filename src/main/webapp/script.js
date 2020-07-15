@@ -36,6 +36,8 @@ function createNoteElement(note) {
   const message = document.createElement('p');
   message.innerText = note.message;
 
+  const categories = createUlElement(note.categories);
+
   const deleteButtonElement = document.createElement('button');
   deleteButtonElement.innerText = 'Delete';
   deleteButtonElement.addEventListener('click', () => {
@@ -44,6 +46,18 @@ function createNoteElement(note) {
     // Remove the note from the DOM.
     noteElement.remove();
   });
+
+  /** Creates a <ul> element containing categories. */
+function createUlElement(categories) {
+  const ulElement = document.createElement('ul');
+  for (j = 0; j < categories.length; j++){
+    const liElement = document.createElement('li');
+    liElement.innerText = categories[j];
+    ulElement.appendChild(liElement);
+  }
+  ulElement.style.cssText = 'font-size:13px;';
+  return ulElement;
+}
 
   noteElement.appendChild(imageElement);
   noteElement.appendChild(message);

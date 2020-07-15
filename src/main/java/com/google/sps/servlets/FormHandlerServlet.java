@@ -54,7 +54,10 @@ public class FormHandlerServlet extends HttpServlet {
       long id = entity.getKey().getId();
       String imageUrl = (String) entity.getProperty("imageUrl");
       String message = (String) entity.getProperty("message");
-      Note note = new Note(id, imageUrl, message);
+      ArrayList<String> categories = (ArrayList) entity.getProperty("categories");
+
+      Note note = new Note(id, imageUrl, message, categories);
+    
       notes.add(note);
     }
 
@@ -85,6 +88,9 @@ public class FormHandlerServlet extends HttpServlet {
     noteEntity.setProperty("sessionKey", sessionEntityKey);
     noteEntity.setProperty("imageUrl", imageUrl);
     noteEntity.setProperty("message", note.getMessage());
+    noteEntity.setProperty("categories", note.classifyText());
+    
+
     datastore.put(noteEntity);
 
     // Not sure if storing this data is even necessary, but will store for now
