@@ -3,7 +3,6 @@ package com.google.sps.data;
 import com.google.appengine.api.datastore.Key;
 import com.google.cloud.vision.v1.AnnotateImageRequest;
 import com.google.cloud.vision.v1.Image;
-import com.google.cloud.vision.v1.ImageSource;
 import com.google.cloud.vision.v1.Feature;
 import com.google.cloud.vision.v1.ImageAnnotatorClient;
 import com.google.cloud.vision.v1.BatchAnnotateImagesResponse;

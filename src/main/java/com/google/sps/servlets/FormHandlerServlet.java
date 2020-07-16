@@ -52,15 +52,12 @@ public class FormHandlerServlet extends HttpServlet {
 
     List<Note> notes = new ArrayList<>();
     for (Entity entity : results.asIterable()) {
-        System.out.println("ADDING NOTE");
       long id = entity.getKey().getId();
       String imageUrl = (String) entity.getProperty("imageUrl");
       String message = (String) entity.getProperty("message");
       Note note = new Note(id, imageUrl, message);
       notes.add(note);
     }
-
-    System.out.println("notes: " + notes.size());
 
     // Convert the list of notes to JSON.
     Gson gson = new Gson();
