@@ -14,6 +14,7 @@ import com.google.cloud.vision.v1.Block;
 import com.google.cloud.vision.v1.Page;
 import com.google.cloud.vision.v1.TextAnnotation;
 import com.google.cloud.vision.v1.AnnotateImageResponse;
+import com.google.protobuf.ByteString;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,17 +33,18 @@ public final class Note {
     // value is a list of related sentences
     private HashMap<String, List<String>> categorizedText;
 
-    // Not sure if we still need this, but leaving for now
+    /** Constructor called when loading from Datastore. */
     public Note(long id, String imageUrl, String message) {
         this.id = id;
         this.imageUrl = imageUrl;
         this.message = message;
     }
 
-    public Note(Key sessionKey, String imageUrl) throws IOException{
+    /** Constructor called when creating from a POST request. */
+    public Note(Key sessionKey, String imageUrl, byte[] imageBytes) throws IOException{
         this.sessionKey = sessionKey;
         this.imageUrl = imageUrl;
-        this.message = detectDocumentText(this.imageUrl);
+        this.message = detectDocumentText(imageBytes);
     }
 
     public String getOriginalImageUrl(){
@@ -69,16 +71,14 @@ public final class Note {
         return categorizedText;
     }
 
-    /**
+  /**
    * Detects words from a picture and returns them
    * TODO: Clean up the result, sometimes the api misreads, misses entirely, or adds additional words
    *        
    */
-  private String detectDocumentText(String path) throws IOException {
+  private String detectDocumentText(byte[] imageBytes) throws IOException {
     List<AnnotateImageRequest> requests = new ArrayList<>();
-    //This only works when you publish, api can not read local urls
-    ImageSource imgSource = ImageSource.newBuilder().setImageUri(path).build(); 
-    Image img = Image.newBuilder().setSource(imgSource).build();
+    Image img = Image.newBuilder().setContent(ByteString.copyFrom(imageBytes)).build();
     Feature feat = Feature.newBuilder().setType(Feature.Type.DOCUMENT_TEXT_DETECTION).build();
     AnnotateImageRequest request = AnnotateImageRequest.newBuilder().addFeatures(feat).setImage(img).build();
     requests.add(request);
