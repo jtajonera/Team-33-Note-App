@@ -16,6 +16,7 @@
 function loadNotes() {
   fetch('/form-handler').then(response => response.json()).then((notes) => {
     const notesElement = document.getElementById('notes-container');
+    notesElement.innerHTML = '';
     notes.forEach((note) => {
       notesElement.appendChild(createNoteElement(note));
     })
