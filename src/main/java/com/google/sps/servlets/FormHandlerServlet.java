@@ -16,6 +16,7 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.protobuf.ByteString;
+import org.docx4j.openpackaging.exceptions.Docx4JException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -28,6 +29,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.sps.data.Note;
+import com.google.sps.data.Session;
 
 /**
  * When the user submits the form, Blobstore processes the file upload and then forwards the request
@@ -98,7 +100,22 @@ public class FormHandlerServlet extends HttpServlet {
         categorizedTextEntity.setProperty("relatedSentences", entry.getValue());
         datastore.put(categorizedTextEntity);
     }
-    response.sendRedirect("/index.html");
+
+    try {
+        note.writeConvertedDoc();
+    } catch (Docx4JException e) {
+        System.out.println(e);
+    }
+
+    Session session = new Session();
+    String objectName = note.getFileName() + ".docx";
+
+    session.uploadObject(objectName, note.getFilePath());
+    session.generateV4GetObjectSignedUrl(objectName);
+    sessionEntity.setProperty("outputFile", session.getOutputDoc());
+    datastore.put(sessionEntity);
+
+    response.sendRedirect("/output.html");
   }
 
   /** Returns a URL that points to the uploaded file, or null if the user didn't upload a file. */
