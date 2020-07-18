@@ -82,3 +82,7 @@ function fetchBlobstoreUrl() {
         imageForm.classList.remove('hidden');
       });
 }
+
+
+// TODO: Loads the output file as a download link in html
+function loadOutputDoc(){}
