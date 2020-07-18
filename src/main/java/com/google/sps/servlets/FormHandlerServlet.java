@@ -100,14 +100,13 @@ public class FormHandlerServlet extends HttpServlet {
     noteEntity.setProperty("message", note.getMessage());
     noteEntity.setProperty("categories", note.classifyText());
     noteEntity.setProperty("timestamp", timestamp);
-    
 
     datastore.put(noteEntity);
 
     try {
-        note.writeConvertedDoc();
+      note.writeConvertedDoc();
     } catch (Docx4JException e) {
-        System.out.println(e);
+      System.out.println(e);
     }
 
     Session session = new Session();
