@@ -48,6 +48,7 @@ public final class Note {
     private final String imageUrl;
     private final String message;
     private final ArrayList<String> categories;
+
     
     /** Constructor called when loading from Datastore. */
     public Note(long id, String imageUrl, String message, ArrayList<String> categories) {
@@ -81,6 +82,28 @@ public final class Note {
         return fileName;
     }
 public ArrayList<String> classifyText() {
+      // Instantiate the Language client com.google.cloud.language.v1.LanguageServiceClient
+      try (LanguageServiceClient language = LanguageServiceClient.create()) {
+        // set content to the text string
+        Document doc = Document.newBuilder().setContent(getMessage()).setType(Type.PLAIN_TEXT).build();
+        ClassifyTextRequest request = ClassifyTextRequest.newBuilder().setDocument(doc).build();
+        // detect categories in the given text
+        ClassifyTextResponse response = language.classifyText(request);
+
+        ArrayList<String> categories = new ArrayList<>();
+
+        for (ClassificationCategory category : response.getCategoriesList()) {
+          String output = category.getName() + " " + category.getConfidence();
+          categories.add(output);  
+        }
+        return categories;
+      } 
+      catch(Exception e) {
+        return new ArrayList();
+      }
+    }
+
+    public ArrayList<String> classifyText() {
       // Instantiate the Language client com.google.cloud.language.v1.LanguageServiceClient
       try (LanguageServiceClient language = LanguageServiceClient.create()) {
         // set content to the text string

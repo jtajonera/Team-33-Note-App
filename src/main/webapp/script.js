@@ -54,7 +54,7 @@ function createNoteElement(note) {
 }
 
 
-  /** Creates a <ul> element containing categories. */
+/** Creates a <ul> element containing categories. */
 function createUlElement(categories) {
   const ulElement = document.createElement('ul');
   for (j = 0; j < categories.length; j++){

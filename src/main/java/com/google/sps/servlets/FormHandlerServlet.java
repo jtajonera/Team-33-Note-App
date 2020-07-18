@@ -60,7 +60,6 @@ public class FormHandlerServlet extends HttpServlet {
       ArrayList<String> categories = (ArrayList) entity.getProperty("categories");
 
       Note note = new Note(id, imageUrl, message, categories);
-    
       notes.add(note);
     }
 
