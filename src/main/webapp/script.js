@@ -24,6 +24,7 @@ function loadNotes() {
 }
 
 /** Creates an element that represents a note, including its delete button. */
+/** Creates an element that represents a note, including its delete button. */
 function createNoteElement(note) {
   const noteElement = document.createElement('div');
   noteElement.className = 'note';
@@ -36,8 +37,6 @@ function createNoteElement(note) {
   const message = document.createElement('p');
   message.innerText = note.message;
 
-  const categories = createUlElement(note.categories);
-
   const deleteButtonElement = document.createElement('button');
   deleteButtonElement.innerText = 'Delete';
   deleteButtonElement.addEventListener('click', () => {
@@ -46,6 +45,14 @@ function createNoteElement(note) {
     // Remove the note from the DOM.
     noteElement.remove();
   });
+
+  noteElement.appendChild(imageElement);
+  noteElement.appendChild(message);
+  noteElement.appendChild(createUlElement(note.categories));
+  noteElement.appendChild(deleteButtonElement);
+  return noteElement;
+}
+
 
   /** Creates a <ul> element containing categories. */
 function createUlElement(categories) {
@@ -57,12 +64,6 @@ function createUlElement(categories) {
   }
   ulElement.style.cssText = 'font-size:13px;';
   return ulElement;
-}
-
-  noteElement.appendChild(imageElement);
-  noteElement.appendChild(message);
-  noteElement.appendChild(deleteButtonElement);
-  return noteElement;
 }
 
 /** Tells the server to delete the note. */
@@ -83,3 +84,7 @@ function fetchBlobstoreUrl() {
         imageForm.classList.remove('hidden');
       });
 }
+
+
+// TODO: Loads the output file as a download link in html
+function loadOutputDoc(){}

@@ -44,6 +44,17 @@
       <artifactId>google-cloud-vision</artifactId>
       <version>1.99.3</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.docx4j/docx4j -->
+    <dependency>
+      <groupId>org.docx4j</groupId>
+      <artifactId>docx4j</artifactId>
+      <version>6.1.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.cloud</groupId>
+      <artifactId>google-cloud-storage</artifactId>
+      <version>1.111.0</version>
+    </dependency>
   </dependencies>
 
   <build>
