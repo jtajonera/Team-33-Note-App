@@ -6,16 +6,22 @@
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
   </head>
-  <body onload="fetchBlobstoreUrl()">
+  <body onload="fetchBlobstoreUrl(); loadCategories();">
     <div id="content">
       <h1>GetchaNotes</h1>
       <form id="my-form" class="hidden" method="POST" enctype="multipart/form-data">
         <p>Upload an image:</p>
         <input type="file" name="image">
         <br/><br/>
-        <button type="submit">Submit</button>
+        <button type="submit" onclick="loadCategories()">Submit</button>
       </form>
       <br/><br/>
+      <p>Categories</p>
+      <label class="container">All
+        <input type="checkbox" checked="checked">
+        <span class="checkmark"></span>
+      </label>
+      <div id="categories-container"></div>
       <button onclick="loadNotes()">View Notes</button>
       <br/><br/>
       <div id="notes-container"></div>

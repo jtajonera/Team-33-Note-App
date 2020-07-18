@@ -57,8 +57,14 @@ public class FormHandlerServlet extends HttpServlet {
       long id = entity.getKey().getId();
       String imageUrl = (String) entity.getProperty("imageUrl");
       String message = (String) entity.getProperty("message");
-      ArrayList<String> categories = (ArrayList) entity.getProperty("categories");
-
+      ArrayList<String> categories;
+      
+      if (entity.getProperty("categories") == null) {
+        categories = new ArrayList<>();
+      } else {
+        categories = (ArrayList) entity.getProperty("categories");
+      }
+       
       Note note = new Note(id, imageUrl, message, categories);
       notes.add(note);
     }

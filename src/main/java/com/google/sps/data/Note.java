@@ -49,7 +49,6 @@ public final class Note {
     private final String message;
     private final ArrayList<String> categories;
     private HashMap<String, List<String>> categorizedText;
-    private String word;
     
     /** Constructor called when loading from Datastore. */
     public Note(long id, String imageUrl, String message, ArrayList<String> categories) {
@@ -95,13 +94,14 @@ public final class Note {
         ArrayList<String> categories = new ArrayList<>();
 
         for (ClassificationCategory category : response.getCategoriesList()) {
-          String output = category.getName() + " " + category.getConfidence();
+          String output = category.getName().substring(1);
           categories.add(output);  
         }
+
         return categories;
       } 
       catch(Exception e) {
-        return new ArrayList();
+        return new ArrayList<>();
       }
     }
 

@@ -12,6 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/** Fetches categories from the server and adds them to the DOM. */
+function loadCategories() {
+  fetch('/categories').then(response => response.json()).then((categories) => {
+    const categoriesElement = document.getElementById('categories-container');
+    categoriesElement.innerHTML = '';
+    
+    categories.forEach((category) => {
+      categoriesElement.appendChild(createCategoryElement(category));
+    })
+  });
+}
+
 /** Fetches notes from the server and adds them to the DOM. */
 function loadNotes() {
   fetch('/form-handler').then(response => response.json()).then((notes) => {
@@ -23,7 +35,23 @@ function loadNotes() {
   });
 }
 
-/** Creates an element that represents a note, including its delete button. */
+/** Creates a checkbox element that represents a category */
+function createCategoryElement(category) {
+  const categoryElement = document.createElement('label');
+  categoryElement.className = 'container';
+  categoryElement.innerHTML = category;
+
+  const inputElement = document.createElement('input');
+  inputElement.setAttribute('type', 'checkbox');
+
+  const spanElement = document.createElement('span');
+  categoryElement.className = 'checkmark';
+  
+  categoryElement.appendChild(inputElement);
+  categoryElement.appendChild(spanElement);
+  return categoryElement;
+}
+
 /** Creates an element that represents a note, including its delete button. */
 function createNoteElement(note) {
   const noteElement = document.createElement('div');
