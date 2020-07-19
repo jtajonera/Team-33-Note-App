@@ -94,6 +94,7 @@ public final class Note {
 
       for (ClassificationCategory category : response.getCategoriesList()) {
         String output = category.getName().substring(1);
+        output = output.replaceAll("&","and");
         categories.add(output);  
       }
 

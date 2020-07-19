@@ -26,24 +26,47 @@ function loadCategories() {
 
 /** Fetches notes from the server and adds them to the DOM. */
 function loadNotes() {
+
+  // Create a list of categories that were checked
+  const checkedCategories = document.getElementsByClassName('checkmark');
+  const checkedLabels = document.getElementsByClassName('category');
+
   fetch('/form-handler').then(response => response.json()).then((notes) => {
     const notesElement = document.getElementById('notes-container');
     notesElement.innerHTML = '';
     notes.forEach((note) => {
-      notesElement.appendChild(createNoteElement(note));
+
+      // Check whether note contains a category in the list of checked categories
+      for (i = 0; i < checkedCategories.length; i++) {
+        if (checkedCategories[i].checked) {
+          if (note.categories.includes(checkedLabels[i].innerHTML)) {
+            notesElement.appendChild(createNoteElement(note));
+          } else if (checkedLabels[i].innerHTML == "All") {
+            notesElement.appendChild(createNoteElement(note));
+          } else if (checkedLabels[i].innerHTML == "Miscellaneous") {
+            if (note.categories.length == 0) {
+              notesElement.appendChild(createNoteElement(note));
+            }
+          }
+        }
+      }
     })
   });
 }
 
 /** Creates a checkbox element that represents a category */
 function createCategoryElement(category) {
-  const categoryElement = document.createElement('label');
-  categoryElement.className = 'category';
-  categoryElement.innerHTML = category;
+  const categoryElement = document.createElement('div');
+  
+  const labelElement = document.createElement('label');
+  labelElement.className = 'category';
+  labelElement.innerHTML = category;
 
   const inputElement = document.createElement('input');
   inputElement.setAttribute('type', 'checkbox');
+  inputElement.className = 'checkmark';
   
+  categoryElement.appendChild(labelElement);
   categoryElement.appendChild(inputElement);
   return categoryElement;
 }
