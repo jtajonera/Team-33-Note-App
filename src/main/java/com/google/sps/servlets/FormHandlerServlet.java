@@ -57,7 +57,15 @@ public class FormHandlerServlet extends HttpServlet {
       long id = entity.getKey().getId();
       String imageUrl = (String) entity.getProperty("imageUrl");
       String message = (String) entity.getProperty("message");
-      Note note = new Note(id, imageUrl, message);
+      ArrayList<String> categories;
+      
+      if (entity.getProperty("categories") == null) {
+        categories = new ArrayList<>();
+      } else {
+        categories = (ArrayList) entity.getProperty("categories");
+      }
+       
+      Note note = new Note(id, imageUrl, message, categories);
       notes.add(note);
     }
 
@@ -90,21 +98,15 @@ public class FormHandlerServlet extends HttpServlet {
     noteEntity.setProperty("sessionKey", sessionEntityKey);
     noteEntity.setProperty("imageUrl", imageUrl);
     noteEntity.setProperty("message", note.getMessage());
+    noteEntity.setProperty("categories", note.classifyText());
+    noteEntity.setProperty("timestamp", timestamp);
+
     datastore.put(noteEntity);
 
-    // Not sure if storing this data is even necessary, but will store for now
-    for (Map.Entry<String, List<String>> entry : note.getCategorizedText().entrySet()) {
-        Entity categorizedTextEntity = new Entity("Categorized Text");
-        categorizedTextEntity.setProperty("sessionKey", sessionEntityKey);
-        categorizedTextEntity.setProperty("heading", entry.getKey());
-        categorizedTextEntity.setProperty("relatedSentences", entry.getValue());
-        datastore.put(categorizedTextEntity);
-    }
-
     try {
-        note.writeConvertedDoc();
+      note.writeConvertedDoc();
     } catch (Docx4JException e) {
-        System.out.println(e);
+      System.out.println(e);
     }
 
     Session session = new Session();

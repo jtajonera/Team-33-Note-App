@@ -12,15 +12,70 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/** Fetches categories from the server and adds them to the DOM. */
+function loadCategories() {
+  fetch('/categories').then(response => response.json()).then((categories) => {
+    const categoriesElement = document.getElementById('categories-container');
+    categoriesElement.innerHTML = '';
+    
+    categories.forEach((category) => {
+      categoriesElement.appendChild(createCategoryElement(category));
+    })
+  });
+}
+
 /** Fetches notes from the server and adds them to the DOM. */
 function loadNotes() {
+
+  // Create a list of checked categories
+  const checkedCategories = document.getElementsByClassName('checkmark');
+  const checkedLabels = document.getElementsByClassName('category');
+
   fetch('/form-handler').then(response => response.json()).then((notes) => {
     const notesElement = document.getElementById('notes-container');
     notesElement.innerHTML = '';
+
+    if (checkedCategories[0].checked) {
+      notes.forEach((note) => {
+        notesElement.appendChild(createNoteElement(note)); 
+      })
+      return;
+    }
+
     notes.forEach((note) => {
-      notesElement.appendChild(createNoteElement(note));
+
+      // Check whether note contains a category in the list of checked categories
+      for (i = 0; i < checkedCategories.length; i++) {
+        if (checkedCategories[i].checked) {
+          if (note.categories.includes(checkedLabels[i].innerHTML)) {
+            notesElement.appendChild(createNoteElement(note));
+          } else if (checkedLabels[i].innerHTML == "Miscellaneous") {
+            if (note.categories.length == 0) {
+              notesElement.appendChild(createNoteElement(note));
+            }
+          }
+        }
+      }
     })
   });
+}
+
+/** Creates a checkbox element that represents a category */
+function createCategoryElement(category) {
+  const categoryElement = document.createElement('div');
+  categoryElement.className = 'filter';
+  
+  const labelElement = document.createElement('label');
+  labelElement.className = 'category';
+  labelElement.innerHTML = category;
+
+  const inputElement = document.createElement('input');
+  inputElement.setAttribute('type', 'checkbox');
+  inputElement.className = 'checkmark';
+  
+  categoryElement.appendChild(labelElement);
+  categoryElement.appendChild(inputElement);
+  return categoryElement;
 }
 
 /** Creates an element that represents a note, including its delete button. */
@@ -47,8 +102,22 @@ function createNoteElement(note) {
 
   noteElement.appendChild(imageElement);
   noteElement.appendChild(message);
+  noteElement.appendChild(createUlElement(note.categories));
   noteElement.appendChild(deleteButtonElement);
   return noteElement;
+}
+
+
+/** Creates a <ul> element containing categories. */
+function createUlElement(categories) {
+  const ulElement = document.createElement('ul');
+  for (j = 0; j < categories.length; j++){
+    const liElement = document.createElement('li');
+    liElement.innerText = categories[j];
+    ulElement.appendChild(liElement);
+  }
+  ulElement.style.cssText = 'font-size:13px;';
+  return ulElement;
 }
 
 /** Tells the server to delete the note. */

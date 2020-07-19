@@ -17,6 +17,15 @@ import com.google.cloud.vision.v1.Block;
 import com.google.cloud.vision.v1.Page;
 import com.google.cloud.vision.v1.TextAnnotation;
 import com.google.cloud.vision.v1.AnnotateImageResponse;
+
+import com.google.cloud.language.v1.ClassificationCategory;
+import com.google.cloud.language.v1.ClassifyTextRequest;
+import com.google.cloud.language.v1.ClassifyTextResponse;
+import com.google.cloud.language.v1.Document;
+import com.google.cloud.language.v1.Document.Type;
+import com.google.cloud.language.v1.EncodingType;
+import com.google.cloud.language.v1.LanguageServiceClient;
+
 import com.google.protobuf.ByteString;
 import java.io.File; 
 import java.io.IOException;
@@ -26,83 +35,87 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 
 public final class Note {
-    private long id;
-    private Key sessionKey;
-    private String filePath;
-    private String fileName;
-    private final String imageUrl;
-    private final String message;
+  private long id;
+  private Key sessionKey;
+  private String filePath;
+  private String fileName;
+  private final String imageUrl;
+  private final String message;
+  private final ArrayList<String> categories;
     
-    // how I'd imagine the NLP text can be sorted
-    // key is the keyword/heading
-    // value is a list of related sentences
-    private HashMap<String, List<String>> categorizedText;
+  /** Constructor called when loading from Datastore. */
+  public Note(long id, String imageUrl, String message, ArrayList<String> categories) {
+    this.id = id;
+    this.imageUrl = imageUrl;
+    this.message = message;
+    this.categories = categories;
+  }
 
-    /** Constructor called when loading from Datastore. */
-    public Note(long id, String imageUrl, String message) {
-        this.id = id;
-        this.imageUrl = imageUrl;
-        this.message = message;
-    }
+  /** Constructor called when creating from a POST request. */
+  public Note(Key sessionKey, String imageUrl, byte[] imageBytes) throws IOException{
+    this.sessionKey = sessionKey;
+    this.imageUrl = imageUrl;
+    this.message = detectDocumentText(imageBytes);
+    this.categories = classifyText();
+  }
 
-    /** Constructor called when creating from a POST request. */
-    public Note(Key sessionKey, String imageUrl, byte[] imageBytes) throws IOException{
-        this.sessionKey = sessionKey;
-        this.imageUrl = imageUrl;
-        this.message = detectDocumentText(imageBytes);
-    }
+  public String getOriginalImageUrl(){
+    return imageUrl;
+  }
 
-    public String getOriginalImageUrl(){
-        return imageUrl;
-    }
-
-    public String getMessage(){
-        return message;
-    }
+  public String getMessage(){
+    return message;
+  }
     
-    public String getFilePath(){
-        return filePath;
+  public String getFilePath(){
+    return filePath;
+  }
+
+  public String getFileName(){
+    return fileName;
+  }
+
+  public ArrayList<String> classifyText() {
+    // Instantiate the Language client com.google.cloud.language.v1.LanguageServiceClient
+    try (LanguageServiceClient language = LanguageServiceClient.create()) {
+      // set content to the text string
+      Document doc = Document.newBuilder().setContent(getMessage()).setType(Type.PLAIN_TEXT).build();
+      ClassifyTextRequest request = ClassifyTextRequest.newBuilder().setDocument(doc).build();
+      // detect categories in the given text
+      ClassifyTextResponse response = language.classifyText(request);
+
+      ArrayList<String> categories = new ArrayList<>();
+
+      for (ClassificationCategory category : response.getCategoriesList()) {
+        String output = category.getName().substring(1);
+        output = output.replaceAll("&","and");
+        categories.add(output);  
+      }
+
+      return categories;
+    } 
+    catch(Exception e) {
+      return new ArrayList<>();
     }
+  }
 
-    public String getFileName(){
-        return fileName;
-    }
+  public void writeConvertedDoc() throws Docx4JException, IOException {
+    WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.createPackage();		
+    wordMLPackage.getMainDocumentPart().addStyledParagraphOfText("Title", "Test Notes");
 
-    public void writeConvertedDoc() throws Docx4JException, IOException {
-        WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.createPackage();		
-        wordMLPackage.getMainDocumentPart().addStyledParagraphOfText("Title", "Test Notes");
+    wordMLPackage.getMainDocumentPart().addParagraphOfText("from docx4j!");
 
-        wordMLPackage.getMainDocumentPart().addParagraphOfText("from docx4j!");
-
-        // saved in Team-33-Note-App/target/portfolio-1
-        fileName = String.format("Getcha_Notes_%d", sessionKey.getId());
-        filePath = String.format("%s/%s", System.getProperty("user.dir"), fileName);
-        wordMLPackage.save(new File(filePath));
-    }
-
-    // TODO: Depending on how the NLP is handled, we can avoid storing headings and sentences
-    // in DataStore and write the converted doc from within this class. 
-    public HashMap<String, List<String>> getCategorizedText(){
-        // temporary data
-        categorizedText = new HashMap<>();
-        ArrayList<String> someSentences = new ArrayList<>(Arrays.asList(
-            "Adult cats have 30 teeth, while kittens have 26.", 
-            "A house cat is genetically 95.6% tiger.",
-            "Cats can jump 5 times their height."));
-        ArrayList<String> someMoreSentences = new ArrayList<>(Arrays.asList(
-            "A dog’s nose print is unique, much like a person’s fingerprint.", 
-            "The shape of a dog’s face suggests its longevity: A long face means a longer life.",
-            "All puppies are born deaf."));
-        categorizedText.put("Cats", someSentences);
-        categorizedText.put("Dog", someMoreSentences);
-
-        return categorizedText;
-    }
+    // saved in Team-33-Note-App/target/portfolio-1
+    fileName = String.format("Getcha_Notes_%d", sessionKey.getId());
+    filePath = String.format("%s/%s", System.getProperty("user.dir"), fileName);
+    wordMLPackage.save(new File(filePath));
+  }
 
   /**
    * Detects words from a picture and returns them
@@ -119,53 +132,54 @@ public final class Note {
         // Initialize client that will be used to send requests. This client only needs to be created
         // once, and can be reused for multiple requests. After completing all of your requests, call
         // the "close" method on the client to safely clean up any remaining background resources.
-        try (ImageAnnotatorClient client = ImageAnnotatorClient.create()) {
-        BatchAnnotateImagesResponse response = client.batchAnnotateImages(requests);
-        List<AnnotateImageResponse> responses = response.getResponsesList();
-        client.close();
+      try (ImageAnnotatorClient client = ImageAnnotatorClient.create()) {
+      BatchAnnotateImagesResponse response = client.batchAnnotateImages(requests);
+      List<AnnotateImageResponse> responses = response.getResponsesList();
+      client.close();
         
-        // Check to see if any of the responses are errors
-        for (AnnotateImageResponse res : responses) {
-            if (res.hasError()) {
-            System.out.format("Error: %s%n", res.getError().getMessage());
-            return "Error: " + res.getError().getMessage();
-            }
+      // Check to see if any of the responses are errors
+      for (AnnotateImageResponse res : responses) {
+        if (res.hasError()) {
+          System.out.format("Error: %s%n", res.getError().getMessage());
+          return "Error: " + res.getError().getMessage();
+        }
         
-            // For full list of available annotations, see http://g.co/cloud/vision/docs
-            TextAnnotation annotation = res.getFullTextAnnotation();
-            for (Page page : annotation.getPagesList()) {
-            String pageText = "";
-                for (Block block : page.getBlocksList()) {
-                String blockText = "";
-                for (Paragraph para : block.getParagraphsList()) {
-                String paraText = "";
-                for (Word word : para.getWordsList()) {
+        // For full list of available annotations, see http://g.co/cloud/vision/docs
+        TextAnnotation annotation = res.getFullTextAnnotation();
+        for (Page page : annotation.getPagesList()) {
+          String pageText = "";
+          for (Block block : page.getBlocksList()) {
+            String blockText = "";
+            for (Paragraph para : block.getParagraphsList()) {
+              String paraText = "";
+              for (Word word : para.getWordsList()) {
                 String wordText = "";
                 for (Symbol symbol : word.getSymbolsList()) {
-                    wordText = wordText + symbol.getText();
-                    System.out.format(
-                    "Symbol text: %s (confidence: %f)%n",
-                    symbol.getText(), symbol.getConfidence());
-                    }
-                    System.out.format(
+                  wordText = wordText + symbol.getText();
+                  System.out.format(
+                      "Symbol text: %s (confidence: %f)%n",
+                      symbol.getText(), symbol.getConfidence());
+                }
+                System.out.format(
                     "Word text: %s (confidence: %f)%n%n", wordText, word.getConfidence());
                     paraText = String.format("%s %s", paraText, wordText);
-                    }
-                    // Output Example using Paragraph:
-                    System.out.println("%nParagraph: %n" + paraText);
-                    System.out.format("Paragraph Confidence: %f%n", para.getConfidence());
-                    blockText = blockText + paraText;
-                }
-                pageText = pageText + blockText;
-                }
+              }
+              // Output Example using Paragraph:
+              System.out.println("%nParagraph: %n" + paraText);
+              System.out.format("Paragraph Confidence: %f%n", para.getConfidence());
+              blockText = blockText + paraText;
             }
-            return annotation.getText();
+            pageText = pageText + blockText;
+          }
         }
-        }
-        catch(Exception e) {
-        return "ERROR: ImageAnnotatorClient Failed, " + e;
-        }
-        // Case where the ImageAnnotatorClient works, but there are no responses from it.
-        return "Error: No responses";
+          
+        return annotation.getText();
+      }
     }
+    catch(Exception e) {
+      return "ERROR: ImageAnnotatorClient Failed, " + e;
+    }
+    // Case where the ImageAnnotatorClient works, but there are no responses from it.
+    return "Error: No responses";
+  }
 }
