@@ -18,7 +18,7 @@ import java.util.HashSet;
 import java.util.ArrayList;
 import com.google.gson.Gson;
 
-/** Servlet responsible for deleting notes. */
+/** Servlet that returns a list of categories. */
 @WebServlet("/categories")
 public class CategoriesServlet extends HttpServlet {
 

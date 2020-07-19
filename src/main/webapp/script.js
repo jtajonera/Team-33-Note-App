@@ -38,17 +38,13 @@ function loadNotes() {
 /** Creates a checkbox element that represents a category */
 function createCategoryElement(category) {
   const categoryElement = document.createElement('label');
-  categoryElement.className = 'container';
+  categoryElement.className = 'category';
   categoryElement.innerHTML = category;
 
   const inputElement = document.createElement('input');
   inputElement.setAttribute('type', 'checkbox');
-
-  const spanElement = document.createElement('span');
-  categoryElement.className = 'checkmark';
   
   categoryElement.appendChild(inputElement);
-  categoryElement.appendChild(spanElement);
   return categoryElement;
 }
 
