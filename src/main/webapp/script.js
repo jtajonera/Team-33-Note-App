@@ -27,21 +27,27 @@ function loadCategories() {
 /** Fetches notes from the server and adds them to the DOM. */
 function loadNotes() {
 
-  // Create a list of categories that were checked
+  // Create a list of checked categories
   const checkedCategories = document.getElementsByClassName('checkmark');
   const checkedLabels = document.getElementsByClassName('category');
 
   fetch('/form-handler').then(response => response.json()).then((notes) => {
     const notesElement = document.getElementById('notes-container');
     notesElement.innerHTML = '';
+
+    if (checkedCategories[0].checked) {
+      notes.forEach((note) => {
+        notesElement.appendChild(createNoteElement(note)); 
+      })
+      return;
+    }
+
     notes.forEach((note) => {
 
       // Check whether note contains a category in the list of checked categories
       for (i = 0; i < checkedCategories.length; i++) {
         if (checkedCategories[i].checked) {
           if (note.categories.includes(checkedLabels[i].innerHTML)) {
-            notesElement.appendChild(createNoteElement(note));
-          } else if (checkedLabels[i].innerHTML == "All") {
             notesElement.appendChild(createNoteElement(note));
           } else if (checkedLabels[i].innerHTML == "Miscellaneous") {
             if (note.categories.length == 0) {
@@ -57,6 +63,7 @@ function loadNotes() {
 /** Creates a checkbox element that represents a category */
 function createCategoryElement(category) {
   const categoryElement = document.createElement('div');
+  categoryElement.className = 'filter';
   
   const labelElement = document.createElement('label');
   labelElement.className = 'category';

@@ -16,15 +16,21 @@
         <button type="submit" onclick="loadCategories()">Submit</button>
       </form>
       <br/><br/>
-      <p>Categories</p>
-      <label class="category">All</label>
-      <input class="checkmark" type="checkbox" checked="checked">
-      <label class="category">Miscellaneous</label>
-      <input class="checkmark" type="checkbox">
-      <div id="categories-container"></div>
-      <button onclick="loadNotes()">View Notes</button>
-      <br/><br/>
-      <div id="notes-container"></div>
+      <div>
+        <p>Categories</p>
+        <div class="filter">
+          <label class="category">All</label>
+          <input class="checkmark" type="checkbox" checked="checked">
+        </div>
+        <div class="filter">
+          <label class="category">Miscellaneous</label>
+          <input class="checkmark" type="checkbox">
+        </div>
+        <div id="categories-container"></div>
+        <button onclick="loadNotes()">View Notes</button>
+        <br/><br/>
+        <div id="notes-container"></div>
+      </div>
     </div>
   </body>
 </html>
