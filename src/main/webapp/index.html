@@ -2,35 +2,76 @@
 <html>
   <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>GetchaNotes</title>
-    <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
+     <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link href="style.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
   </head>
-  <body onload="fetchBlobstoreUrl(); loadCategories();">
-    <div id="content">
-      <h1>GetchaNotes</h1>
-      <form id="my-form" class="hidden" method="POST" enctype="multipart/form-data">
-        <p>Upload an image:</p>
-        <input type="file" name="image">
-        <br/><br/>
-        <button type="submit" onclick="loadCategories()">Submit</button>
-      </form>
-      <br/><br/>
-      <div>
-        <p>Categories</p>
-        <div class="filter">
-          <label class="category">All</label>
-          <input class="checkmark" type="checkbox" checked="checked">
-        </div>
-        <div class="filter">
-          <label class="category">Miscellaneous</label>
-          <input class="checkmark" type="checkbox">
-        </div>
-        <div id="categories-container"></div>
-        <button onclick="loadNotes()">View Notes</button>
-        <br/><br/>
-        <div id="notes-container"></div>
-      </div>
+<body class="text-center" onload="fetchBlobstoreUrl(); loadCategories();">
+    <div class="inner"> 
+        <nav class="nav-custom navbar-expand-sm navbar-dark fixed-top">
+            <header class="masthead mb-auto">
+                <div class="inner">
+                <h3 class="masthead-brand">GetchaNotes
+                    <i class="fas fa-file-alt"></i>
+                </h3>
+                <nav class="nav nav-masthead justify-content-center">
+                    <a class="nav-link active" href="index.html">Home</a>
+                    <a class="nav-link" href="about.html">About us</a>
+                </nav>
+                </div>
+            </header>
+        </nav>
     </div>
+    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+        
+        <main role="main" class="inner cover">
+            <h1 class="cover-heading">Digitalize your notes.</h1>
+            <p class="lead">GetchaNotes will convert images of your hand-written notes to a digitized version using OCR and NLP technologies.</p>
+            <p class="lead">
+                <!-- <a href="#" class="btn btn-lg btn-secondary">Learn more</a> PLACE BUTTON HERE -->
+                <form id="my-form" class="hidden" method="POST" enctype="multipart/form-data">
+                    <p>Upload an image:</p>
+                    <label class="btn btn-secondary">
+                        <input type="file" name="image" id="file-upload"> Choose File
+                    </label>
+                    <label id="file-name"></label>
+                    <br/>
+                    <button type="submit" onclick="loadCategories()" class="btn btn-secondary">Submit</button>
+                </form>
+    
+            </p>
+            <div>
+                <p>Categories</p>
+                <div class="filter">
+                <label class="category">All</label>
+                <input class="checkmark" type="checkbox" checked="checked">
+                </div>
+                <div class="filter">
+                <label class="category">Miscellaneous</label>
+                <input class="checkmark" type="checkbox">
+                </div>
+                <div id="categories-container"></div>
+                <button onclick="loadNotes()" class="btn btn-secondary">View Notes</button>
+                <br/><br/>
+                <div id="notes-container"></div>
+            </div>
+        </main>
+        <footer class="mastfoot mt-auto">
+        </footer>
+    </div>
+    
+    <script type="text/javascript">
+        document.querySelector("#file-upload").onchange = function(){
+            document.querySelector("#file-name").textContent = this.files[0].name;
+        }
+    </script>
+    <script src="script.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
   </body>
 </html>

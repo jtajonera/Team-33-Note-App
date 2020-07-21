@@ -99,7 +99,7 @@ function createNoteElement(note) {
     // Remove the note from the DOM.
     noteElement.remove();
   });
-
+  deleteButtonElement.classList.add("btn", "btn-secondary");
   noteElement.appendChild(imageElement);
   noteElement.appendChild(message);
   noteElement.appendChild(createUlElement(note.categories));
