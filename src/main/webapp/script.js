@@ -90,7 +90,6 @@ function createNoteElement(note) {
 
   const message = document.createElement('p');
   message.innerText = note.message;
-
   const deleteButtonElement = document.createElement('button');
   deleteButtonElement.innerText = 'Delete';
   deleteButtonElement.addEventListener('click', () => {
@@ -103,6 +102,7 @@ function createNoteElement(note) {
   noteElement.appendChild(imageElement);
   noteElement.appendChild(message);
   noteElement.appendChild(createUlElement(note.categories));
+  noteElement.appendChild(document.createElement('br'));
   noteElement.appendChild(deleteButtonElement);
   return noteElement;
 }
@@ -116,7 +116,7 @@ function createUlElement(categories) {
     liElement.innerText = categories[j];
     ulElement.appendChild(liElement);
   }
-  ulElement.style.cssText = 'font-size:13px;';
+  ulElement.style.cssText = 'display: inline-block; font-size:13px;';
   return ulElement;
 }
 
