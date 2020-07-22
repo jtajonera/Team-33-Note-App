@@ -4,24 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>GetchaNotes</title>
-    <script src="script.js"></script>
      <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-    <link href="style.css" rel="stylesheet">
+    <link href="${pageContext.servletContext.contextPath}/style.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
   </head>
-<body class="text-center" onload="loadOutputDoc()">
+<body class="text-center">
     <div class="inner"> 
         <nav class="nav-custom navbar-expand-sm navbar-dark fixed-top">
             <header class="masthead mb-auto">
                 <div class="inner">
-                <h3 class="masthead-brand">GetchaNotes
-                    <i class="fas fa-file-alt"></i>
-                </h3>
-                <nav class="nav nav-masthead justify-content-center">
-                    <a class="nav-link" href="index.html">Home</a>
-                    <a class="nav-link" href="about.html">About us</a>
-                </nav>
+                    <h3 class="masthead-brand">GetchaNotes
+                        <i class="fas fa-file-alt"></i>
+                    </h3>
+                    <nav class="nav nav-masthead justify-content-center">
+                        <a class="nav-link" href="../../../index.html"> Home </a>
+                        <!-- <a  href="{pageContext.servletContext.contextPath}/index.html">Home</a> -->
+                        <a class="nav-link" href="{pageContext.servletContext.contextPath}/about.html">About us</a>
+                    </nav>
                 </div>
             </header>
         </nav>
@@ -29,14 +29,15 @@
     <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
         <main role="main" class="inner cover">
             <h1 class="cover-heading">Your Output</h1>
-            <div id="content">
+            <p>Download your notes here: <a href= <%= request.getAttribute("url") %>>
+            <%= request.getAttribute("fileName") %> </a></p>
             </div>
         </main>
         <footer class="mastfoot mt-auto">
         </footer>
     </div>
 
-    <script src="script.js"></script>
+    <script src="${pageContext.servletContext.contextPath}/script.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>

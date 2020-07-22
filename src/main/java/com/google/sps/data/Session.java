@@ -44,8 +44,7 @@ public final class Session {
 
     // Define resource
     BlobInfo blobInfo = BlobInfo.newBuilder(BlobId.of(BUCKET_NAME, objectName)).build();
-
-    outputDoc = storage.signUrl(blobInfo, 15, TimeUnit.MINUTES, Storage.SignUrlOption.withV4Signature()).toString();
+    outputDoc = storage.signUrl(blobInfo, 7, TimeUnit.DAYS, Storage.SignUrlOption.withV4Signature()).toString();
 
     System.out.println("Generated GET signed URL:");
     System.out.println(outputDoc);
