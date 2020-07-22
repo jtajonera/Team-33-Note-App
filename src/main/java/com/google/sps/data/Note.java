@@ -106,10 +106,12 @@ public final class Note {
   }
 
   public void writeConvertedDoc() throws Docx4JException, IOException {
-    WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.createPackage();		
-    wordMLPackage.getMainDocumentPart().addStyledParagraphOfText("Title", "Test Notes");
+    //if no categories classified then the title is "Getcha Notes" by default
+    String title = !categories.isEmpty() ? categories.get(0) : "Getcha Notes";
 
-    wordMLPackage.getMainDocumentPart().addParagraphOfText("from docx4j!");
+    WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.createPackage();
+    wordMLPackage.getMainDocumentPart().addStyledParagraphOfText("Title", title);
+    wordMLPackage.getMainDocumentPart().addParagraphOfText(message);
 
     // saved in Team-33-Note-App/target/portfolio-1
     fileName = String.format("Getcha_Notes_%d", sessionKey.getId());
