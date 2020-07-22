@@ -48,13 +48,15 @@ public final class Note {
   private final String imageUrl;
   private final String message;
   private final ArrayList<String> categories;
+  private String downloadUrl;
     
   /** Constructor called when loading from Datastore. */
-  public Note(long id, String imageUrl, String message, ArrayList<String> categories) {
+  public Note(long id, String imageUrl, String message, ArrayList<String> categories, String downloadUrl) {
     this.id = id;
     this.imageUrl = imageUrl;
     this.message = message;
     this.categories = categories;
+    this.downloadUrl = downloadUrl;
   }
 
   /** Constructor called when creating from a POST request. */

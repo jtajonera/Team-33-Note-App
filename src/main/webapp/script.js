@@ -26,7 +26,6 @@ function loadCategories() {
 
 /** Fetches notes from the server and adds them to the DOM. */
 function loadNotes() {
-
   // Create a list of checked categories
   const checkedCategories = document.getElementsByClassName('checkmark');
   const checkedLabels = document.getElementsByClassName('category');
@@ -43,7 +42,6 @@ function loadNotes() {
     }
 
     notes.forEach((note) => {
-
       // Check whether note contains a category in the list of checked categories
       for (i = 0; i < checkedCategories.length; i++) {
         if (checkedCategories[i].checked) {
@@ -88,8 +86,13 @@ function createNoteElement(note) {
   const imageElement = document.createElement('img');
   imageElement.src = note.imageUrl;
 
-  const message = document.createElement('p');
-  message.innerText = note.message;
+  const downloadUrl = document.createElement('a');
+  downloadUrl.innerHTML = 'here'
+  downloadUrl.href = note.downloadUrl;
+
+  const message = document.createElement("p");
+  message.innerHTML = "Download notes: ";
+  message.appendChild(downloadUrl);
 
   const deleteButtonElement = document.createElement('button');
   deleteButtonElement.innerText = 'Delete';
@@ -101,8 +104,8 @@ function createNoteElement(note) {
   });
 
   noteElement.appendChild(imageElement);
-  noteElement.appendChild(message);
   noteElement.appendChild(createUlElement(note.categories));
+  noteElement.appendChild(message);
   noteElement.appendChild(deleteButtonElement);
   return noteElement;
 }

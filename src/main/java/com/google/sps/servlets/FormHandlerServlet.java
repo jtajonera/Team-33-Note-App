@@ -58,6 +58,7 @@ public class FormHandlerServlet extends HttpServlet {
       long id = entity.getKey().getId();
       String imageUrl = (String) entity.getProperty("imageUrl");
       String message = (String) entity.getProperty("message");
+      String downloadUrl = (String) entity.getProperty("outputFile");
       ArrayList<String> categories;
       
       if (entity.getProperty("categories") == null) {
@@ -66,7 +67,7 @@ public class FormHandlerServlet extends HttpServlet {
         categories = (ArrayList) entity.getProperty("categories");
       }
        
-      Note note = new Note(id, imageUrl, message, categories);
+      Note note = new Note(id, imageUrl, message, categories, downloadUrl);
       notes.add(note);
     }
 
@@ -102,8 +103,6 @@ public class FormHandlerServlet extends HttpServlet {
     noteEntity.setProperty("categories", note.classifyText());
     noteEntity.setProperty("timestamp", timestamp);
 
-    datastore.put(noteEntity);
-
     try {
       note.writeConvertedDoc();
     } catch (Docx4JException e) {
@@ -112,18 +111,19 @@ public class FormHandlerServlet extends HttpServlet {
 
     Session session = new Session();
     String objectName = note.getFileName() + ".docx";
-
     session.uploadObject(objectName, note.getFilePath());
     session.generateV4GetObjectSignedUrl(objectName);
 
     String outputDocUrl = session.getOutputDoc();
+    noteEntity.setProperty("outputFile", outputDocUrl);
     sessionEntity.setProperty("outputFile", outputDocUrl);
+
+    datastore.put(noteEntity);
     datastore.put(sessionEntity);
 
     request.setAttribute("url", outputDocUrl);
     request.setAttribute("fileName", objectName);
 	request.getRequestDispatcher("output.jsp").forward(request,response);
-    // response.sendRedirect("/output.html");
   }
 
   /** Returns a URL that points to the uploaded file, or null if the user didn't upload a file. */
