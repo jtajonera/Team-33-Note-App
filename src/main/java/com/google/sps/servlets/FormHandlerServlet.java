@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import com.google.gson.Gson;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -79,7 +80,7 @@ public class FormHandlerServlet extends HttpServlet {
 
   /** Add new notes to Datastore. */
   @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
     long timestamp = System.currentTimeMillis();
 
     Entity sessionEntity = new Entity("Session");
@@ -114,10 +115,15 @@ public class FormHandlerServlet extends HttpServlet {
 
     session.uploadObject(objectName, note.getFilePath());
     session.generateV4GetObjectSignedUrl(objectName);
-    sessionEntity.setProperty("outputFile", session.getOutputDoc());
+
+    String outputDocUrl = session.getOutputDoc();
+    sessionEntity.setProperty("outputFile", outputDocUrl);
     datastore.put(sessionEntity);
 
-    response.sendRedirect("/output.html");
+    request.setAttribute("url", outputDocUrl);
+    request.setAttribute("fileName", objectName);
+	request.getRequestDispatcher("output.jsp").forward(request,response);
+    // response.sendRedirect("/output.html");
   }
 
   /** Returns a URL that points to the uploaded file, or null if the user didn't upload a file. */

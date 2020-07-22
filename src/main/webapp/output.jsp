@@ -6,9 +6,11 @@
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
   </head>
-  <body onload="loadOutputDoc()">
+  <body>
     <div id="content">
       <h1>GetchaNotes</h1>
+      <p>Download your notes here: <a href= <%= request.getAttribute("url") %>>
+          <%= request.getAttribute("fileName") %> </a></p>
     </div>
   </body>
 </html>
