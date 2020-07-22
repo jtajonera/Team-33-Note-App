@@ -48,13 +48,15 @@ public final class Note {
   private final String imageUrl;
   private final String message;
   private final ArrayList<String> categories;
+  private String downloadUrl;
     
   /** Constructor called when loading from Datastore. */
-  public Note(long id, String imageUrl, String message, ArrayList<String> categories) {
+  public Note(long id, String imageUrl, String message, ArrayList<String> categories, String downloadUrl) {
     this.id = id;
     this.imageUrl = imageUrl;
     this.message = message;
     this.categories = categories;
+    this.downloadUrl = downloadUrl;
   }
 
   /** Constructor called when creating from a POST request. */
@@ -106,10 +108,12 @@ public final class Note {
   }
 
   public void writeConvertedDoc() throws Docx4JException, IOException {
-    WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.createPackage();		
-    wordMLPackage.getMainDocumentPart().addStyledParagraphOfText("Title", "Test Notes");
+    //if no categories classified then the title is "Getcha Notes" by default
+    String title = !categories.isEmpty() ? categories.get(0) : "Getcha Notes";
 
-    wordMLPackage.getMainDocumentPart().addParagraphOfText("from docx4j!");
+    WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.createPackage();
+    wordMLPackage.getMainDocumentPart().addStyledParagraphOfText("Title", title);
+    wordMLPackage.getMainDocumentPart().addParagraphOfText(message);
 
     // saved in Team-33-Note-App/target/portfolio-1
     fileName = String.format("Getcha_Notes_%d", sessionKey.getId());
