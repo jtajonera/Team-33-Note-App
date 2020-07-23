@@ -108,7 +108,7 @@ public class FormHandlerServlet extends HttpServlet {
     try {
       note.writeConvertedDoc(outStream);
     } catch (Docx4JException e) {
-      System.out.println(e);
+      e.printStackTrace();
     }
 
     Session session = new Session();
