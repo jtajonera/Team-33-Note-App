@@ -102,7 +102,7 @@ function createNoteElement(note) {
     // Remove the note from the DOM.
     noteElement.remove();
   });
-
+  deleteButtonElement.classList.add("btn", "btn-secondary");
   noteElement.appendChild(imageElement);
   noteElement.appendChild(createUlElement(note.categories));
   noteElement.appendChild(message);
@@ -119,7 +119,7 @@ function createUlElement(categories) {
     liElement.innerText = categories[j];
     ulElement.appendChild(liElement);
   }
-  ulElement.style.cssText = 'font-size:13px;';
+  ulElement.style.cssText = 'display: inline-block; font-size:13px;';
   return ulElement;
 }
 
