@@ -29,6 +29,7 @@ import com.google.cloud.language.v1.LanguageServiceClient;
 import com.google.protobuf.ByteString;
 import java.io.File; 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -107,7 +108,7 @@ public final class Note {
     }
   }
 
-  public void writeConvertedDoc() throws Docx4JException, IOException {
+  public void writeConvertedDoc(OutputStream outStream) throws Docx4JException, IOException {
     //if no categories classified then the title is "Getcha Notes" by default
     String title = !categories.isEmpty() ? categories.get(0) : "Getcha Notes";
 
@@ -115,10 +116,8 @@ public final class Note {
     wordMLPackage.getMainDocumentPart().addStyledParagraphOfText("Title", title);
     wordMLPackage.getMainDocumentPart().addParagraphOfText(message);
 
-    // saved in Team-33-Note-App/target/portfolio-1
     fileName = String.format("Getcha_Notes_%d", sessionKey.getId());
-    filePath = String.format("%s/%s", System.getProperty("user.dir"), fileName);
-    wordMLPackage.save(new File(filePath));
+    wordMLPackage.save(outStream);
   }
 
   /**

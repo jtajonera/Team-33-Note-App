@@ -19,6 +19,7 @@ import com.google.protobuf.ByteString;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.ArrayList;
@@ -103,15 +104,17 @@ public class FormHandlerServlet extends HttpServlet {
     noteEntity.setProperty("categories", note.classifyText());
     noteEntity.setProperty("timestamp", timestamp);
 
+    OutputStream outStream = new ByteArrayOutputStream();
     try {
-      note.writeConvertedDoc();
+      note.writeConvertedDoc(outStream);
     } catch (Docx4JException e) {
-      System.out.println(e);
+      e.printStackTrace();
     }
 
     Session session = new Session();
     String objectName = note.getFileName() + ".docx";
-    session.uploadObject(objectName, note.getFilePath());
+    
+    session.uploadObject(objectName, ((ByteArrayOutputStream)(outStream)).toByteArray());
     session.generateV4GetObjectSignedUrl(objectName);
 
     String outputDocUrl = session.getOutputDoc();
