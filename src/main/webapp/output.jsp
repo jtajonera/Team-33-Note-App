@@ -18,7 +18,7 @@
                         <i class="fas fa-file-alt"></i>
                     </h3>
                     <nav class="nav nav-masthead justify-content-center">
-                        <a class="nav-link" href="../../../index.html"> Home </a>
+                        <a class="nav-link" href="/index.html"> Home </a>
                         <!-- <a  href="{pageContext.servletContext.contextPath}/index.html">Home</a> -->
                         <a class="nav-link" href="{pageContext.servletContext.contextPath}/about.html">About us</a>
                     </nav>
