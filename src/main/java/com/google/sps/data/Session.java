@@ -24,13 +24,13 @@ public final class Session {
     return outputDoc;
   }
 
-  public void uploadObject(String objectName, String filePath) throws IOException {
+  public void uploadObject(String objectName, byte[] outputByteArray) throws IOException {
     Storage storage = StorageOptions.newBuilder().setProjectId(PROEJCT_ID).build().getService();
     BlobId blobId = BlobId.of(BUCKET_NAME, objectName);
     BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
-    storage.create(blobInfo, Files.readAllBytes(Paths.get(filePath)));
+    storage.create(blobInfo, outputByteArray);
 
-    System.out.println("File " + filePath + " uploaded to bucket " + BUCKET_NAME + " as " + objectName);
+    System.out.println("Uploaded to bucket " + BUCKET_NAME + " as " + objectName);
   }
 
   /**
